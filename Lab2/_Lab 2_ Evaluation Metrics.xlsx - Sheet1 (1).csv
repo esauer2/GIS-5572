@@ -1,0 +1,284 @@
+Evaluation Approach / Metric,Appropriate Data Types,Mathematic Definition (if applicable),ArcPy Function (if applicable),How to: Python,What metrics is this approach similar/different to?,Sources
+Confusion Matrix,"Categorical, integer or float observations typically stored as lists or arrays","True Positive (TP): the number of positive cases that were correctly classified by the algorithm.
+False Positive (FP): the number of negative cases that were incorrectly classified as positive by the algorithm.
+False Negative (FN): the number of positive cases that were incorrectly classified as negative by the algorithm.
+True Negative (TN): the number of negative cases that were correctly classified by the algorithm.
+
+Actual Positive TP FN
+Actual Negative FP TN",N/A,"import matplotlib.pyplot as plt
+import numpy
+from sklearn import metrics
+
+actual = numpy.random.binomial(insert sample values) # Hypothetical actual vs predicted values
+predicted = numpy.random.binomial(insert sample values)
+
+confusion_matrix = metrics.confusion_matrix(actual, predicted)
+
+cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = confusion_matrix, display_labels = [False, True])
+
+cm_display.plot()
+plt.show()   ","Accuracy, Precision, and Recall","ChatGPT, W3"
+Accuracy,"Categorical, integer or float observations typically stored as lists or arrays in the form of predicted vs actual","Accuracy = (TP + TN) / (TP + TN + FP + FN) where:
+
+TP (True Positives): the number of correctly predicted positive instances
+TN (True Negatives): the number of correctly predicted negative instances
+FP (False Positives): the number of incorrectly predicted positive instances
+FN (False Negatives): the number of incorrectly predicted negative instances","import arcpy
+from sklearn.metrics import accuracy_score","from sklearn.metrics import accuracy_score
+
+# Example predicted and actual values
+predicted = [0, 1, 1, 0, 1, 0, 0, 1, 1]
+actual = [0, 1, 1, 1, 1, 0, 0, 1, 0]
+
+# Calculate accuracy score
+accuracy = accuracy_score(actual, predicted)
+
+# Print accuracy score
+print(""Accuracy:"", accuracy)
+","Precision, Recall, ROC, Confusion Matrix",ChatGPT
+Precision,"Categorical, integer or float observations typically stored as lists or arrays in the form of predicted vs actual","Precision = TP / (TP + FP) where:
+
+TP (True Positives): the number of correctly predicted positive instances
+FP (False Positives): the number of incorrectly predicted positive instances","import arcpy
+from sklearn.metrics import precision_score","from sklearn.metrics import precision_score
+
+# Example predicted and actual values
+predicted = [0, 1, 1, 0, 1, 0, 0, 1, 1]
+actual = [0, 1, 1, 1, 1, 0, 0, 1, 0]
+
+# Calculate precision score
+precision = precision_score(actual, predicted)
+
+# Print precision score
+print(""Precision:"", precision)
+","Recall, Accuracy, ROC, Confusion Matrix",ChatGPT
+Recall,"Categorical, integer or float observations typically stored as lists or arrays in the form of predicted vs actual","Recall = TP / (TP + FN) where:
+
+TP (True Positives): the number of correctly predicted positive instances
+FN (False Negatives): the number of incorrectly predicted negative instances",import arcpy from sklearn.metrics import recall_score,"from sklearn.metrics import recall_score
+
+# Example predicted and actual values
+predicted = [0, 1, 1, 0, 1, 0, 0, 1, 1]
+actual = [0, 1, 1, 1, 1, 0, 0, 1, 0]
+
+# Calculate recall score
+recall = recall_score(actual, predicted)
+
+# Print recall score
+print(""Recall:"", recall)
+","Precision, Accuracy, ROC, Confusion Matrix",ChatGPT
+True Positives,"Categorical, integer or float observations typically stored as lists or arrays",TP (True Positives): the number of correctly predicted positive instances,N/A,"import arcpy import numpy as np # Load the true class labels and predicted class labels into numpy arrays true_labels = arcpy.RasterToNumPyArray(""true_class_labels.tif"") predicted_labels = arcpy.RasterToNumPyArray(""predicted_class_labels.tif"") # Calculate the number of true positives tp = np.sum((true_labels == 1) & (predicted_labels == 1)) # Print the number of true positives print(""True positives: "", tp)","False Positive, ROC",ChatGPT
+False Position (False Positive?),"Categorical, integer or float observations typically stored as lists or arrays",FP = Number of actual negative instances incorrectly predicted as positive,N/A,"import arcpy
+import numpy as np
+
+# Load the true class labels and predicted class labels into numpy arrays
+true_labels = arcpy.RasterToNumPyArray(""true_class_labels.tif"")
+predicted_labels = arcpy.RasterToNumPyArray(""predicted_class_labels.tif"")
+
+# Calculate the number of false positives
+fp = np.sum((true_labels == 0) & (predicted_labels == 1))
+
+# Print the number of false positives
+print(""False positives: "", fp)","True Positive, ROC",ChatGPT
+Receiver Operator Characteristic (ROC) Curve and Area Under the Curve,Plot uses quantative rates derived from either qualitative or quanitative data,"ROC Curve plots the true positive rate (TPR) against the false positive rate (FPR), where: TPR = TP / (TP + FN) and FPR = FP / (FP + TN). The Area Under the Curve is the area under the ROC curve, and it indicates the likelihood that the model will rank a randomly chosen positive instance higher than a randomly chosen negative instance.",N/A,"import arcpy
+import numpy as np
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+
+# Load the true class labels and predicted class probabilities into numpy arrays
+true_labels = arcpy.RasterToNumPyArray(""true_class_labels.tif"")
+predicted_probs = arcpy.RasterToNumPyArray(""predicted_class_probs.tif"")
+
+# Flatten the arrays
+true_labels = true_labels.ravel()
+predicted_probs = predicted_probs.ravel()
+
+# Calculate the false positive rate, true positive rate, and threshold for various thresholds
+fpr, tpr, thresholds = roc_curve(true_labels, predicted_probs)
+
+# Calculate the AUC
+roc_auc = auc(fpr, tpr)
+
+# Plot the ROC curve
+plt.plot(fpr, tpr, color='darkorange', label='ROC curve (AUC = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc=""lower right"")
+plt.show()","Precision-Recall (PR), Confusion Matrix",ChatGPT
+R-squared,Quanitative observations from dataset,"R-squared = 1 - (SSres / SStot)
+
+where:
+
+SSres is the sum of squared residuals or the sum of squared differences between the predicted values and the actual values
+SStot is the total sum of squares or the sum of squared differences between the actual values and the mean of the dependent variable",,"import arcpy
+import numpy as np
+
+# Load the true values and predicted values into numpy arrays
+true_values = arcpy.RasterToNumPyArray(""true_values.tif"")
+predicted_values = arcpy.RasterToNumPyArray(""predicted_values.tif"")
+
+# Calculate the mean of the true values
+true_mean = np.mean(true_values)
+
+# Calculate the total sum of squares (TSS)
+tss = np.sum((true_values - true_mean) ** 2)
+
+# Calculate the residual sum of squares (RSS)
+rss = np.sum((true_values - predicted_values) ** 2)
+
+# Calculate the R-squared value
+r_squared = 1 - (rss / tss)
+
+# Print the R-squared value
+print(""R-squared value: "", r_squared)","Root Mean Squared Error (RMSE), Mean-Squared Error (MSE), Adjusted R-squared, Mean Absolute Error",ChatGPT
+Adjusted R-Squared,Quanitative observations from dataset,"Adjusted R-squared = 1 - [(1 - R-squared) * (n - 1) / (n - k - 1)] where:
+
+R-squared is the coefficient of determination, which is a measure of how well the regression line fits the data
+n is the number of observations or data points in the sample
+k is the number of independent variables (or predictors) in the model",N/A,"import arcpy
+import numpy as np
+
+# Load the true values, predicted values, and number of independent variables into numpy arrays
+true_values = arcpy.RasterToNumPyArray(""true_values.tif"")
+predicted_values = arcpy.RasterToNumPyArray(""predicted_values.tif"")
+num_independent_vars = 3
+
+# Calculate the mean of the true values
+true_mean = np.mean(true_values)
+
+# Calculate the total sum of squares (TSS)
+tss = np.sum((true_values - true_mean) ** 2)
+
+# Calculate the residual sum of squares (RSS)
+rss = np.sum((true_values - predicted_values) ** 2)
+
+# Calculate the degrees of freedom for the residuals
+df_resid = true_values.size - num_independent_vars - 1
+
+# Calculate the degrees of freedom for the model
+df_model = num_independent_vars
+
+# Calculate the adjusted R-squared value
+adj_r_squared = 1 - ((rss / df_resid) / (tss / df_model))
+
+# Print the adjusted R-squared value
+print(""Adjusted R-squared value: "", adj_r_squared)","Root Mean Squared Error (RMSE), Mean-Squared Error (MSE), R-squared, Mean-Absolute Error",ChatGPT
+Root Mean Square Error,Quanitative observations from dataset,"RMSE = sqrt((1/n) * Σ|i=1 to n| (yi - ŷi)^2) where:
+
+n: the number of instances in the dataset
+yi: the i-th actual value
+ŷi: the i-th predicted value",N/A,"import arcpy
+import numpy as np
+
+# Load the true values and predicted values into numpy arrays
+true_values = arcpy.RasterToNumPyArray(""true_values.tif"")
+predicted_values = arcpy.RasterToNumPyArray(""predicted_values.tif"")
+
+# Calculate the residual sum of squares (RSS)
+rss = np.sum((true_values - predicted_values) ** 2)
+
+# Calculate the mean squared error (MSE)
+mse = rss / true_values.size
+
+# Calculate the root mean squared error (RMSE)
+rmse = np.sqrt(mse)
+
+# Print the RMSE value
+print(""RMSE value: "", rmse)","R-squared, Adjusted R-Squared, Mean-Squared Error, Mean Absolute Error",ChatGPT
+Mean Absolute Error,Quanitative observations from dataset,"MAE = (1/n) * Σ|i=1 to n| |yi - ŷi| where:
+
+n: the number of instances in the dataset
+yi: the i-th actual value
+ŷi: the i-th predicted value",N/A,"import arcpy
+import numpy as np
+
+# Load the true values and predicted values into numpy arrays
+true_values = arcpy.RasterToNumPyArray(""true_values.tif"")
+predicted_values = arcpy.RasterToNumPyArray(""predicted_values.tif"")
+
+# Calculate the mean absolute error (MAE)
+mae = np.mean(np.abs(predicted_values - true_values))
+
+# Print the MAE value
+print(""MAE value: "", mae)
+","R-squared, Adjusted R-Squared, Mean-Squared Error, RMSE, Residual Standard Error",ChatGPT
+Residual Standard Error,Quanitative observations from dataset,"RSE = sqrt( SSE / (n - k - 1) )
+
+where:
+
+SSE is the sum of squared errors or residuals, which is the sum of the squared differences between the observed values and the predicted values
+n is the total number of observations
+k is the number of predictor variables (excluding the intercept term)",N/A,"import arcpy
+import numpy as np
+
+# Load the true values and predicted values into numpy arrays
+true_values = arcpy.RasterToNumPyArray(""true_values.tif"")
+predicted_values = arcpy.RasterToNumPyArray(""predicted_values.tif"")
+
+# Calculate the residual sum of squares (RSS)
+rss = np.sum((true_values - predicted_values) ** 2)
+
+# Calculate the degrees of freedom (df)
+df = true_values.size - 2
+
+# Calculate the residual standard error (RSE)
+rse = np.sqrt(rss / df)
+
+# Print the RSE value
+print(""RSE value: "", rse)","R-squared, Adjusted R-Squared, Mean-Squared Error, RMSE",ChatGPT
+Akaike’s Information Criterion (AIC),Quanitative observations from dataset,"AIC = -2 * log(L) + 2 * k
+
+where:
+
+L is the maximized value of the likelihood function of the model
+k is the number of parameters in the model",N/A,"import arcpy
+import numpy as np
+
+# Load the true values and predicted values into numpy arrays
+true_values = arcpy.RasterToNumPyArray(""true_values.tif"")
+predicted_values = arcpy.RasterToNumPyArray(""predicted_values.tif"")
+
+# Calculate the residual sum of squares (RSS)
+rss = np.sum((true_values - predicted_values) ** 2)
+
+# Calculate the degrees of freedom (df)
+df = true_values.size - 2
+
+# Calculate the log-likelihood
+log_likelihood = -0.5 * (df * np.log(2 * np.pi) + df * np.log(rss / df) + df + 1)
+
+# Calculate the Akaike Information Criterion (AIC)
+aic = -2 * log_likelihood + 2 * 2
+
+# Print the AIC value
+print(""AIC value: "", aic)","Bayesian Information Criterion (BIC), Cross Validation",ChatGPT
+Bayesian Information Criterion (BIC),Quanitative observations from dataset,"BIC = -2 * log(L) + k * log(n)
+
+where:
+
+L is the maximized value of the likelihood function of the model
+k is the number of parameters in the model
+n is the number of observations in the data set",N/A,"import arcpy
+import numpy as np
+
+# Load the true values and predicted values into numpy arrays
+true_values = arcpy.RasterToNumPyArray(""true_values.tif"")
+predicted_values = arcpy.RasterToNumPyArray(""predicted_values.tif"")
+
+# Calculate the residual sum of squares (RSS)
+rss = np.sum((true_values - predicted_values) ** 2)
+
+# Calculate the degrees of freedom (df)
+df = true_values.size - 2
+
+# Calculate the log-likelihood
+log_likelihood = -0.5 * (df * np.log(2 * np.pi) + df * np.log(rss / df) + df + 1)
+
+# Calculate the Bayesian Information Criterion (BIC)
+bic = -2 * log_likelihood + np.log(df) * 2
+
+# Print the BIC value
+print(""BIC value: "", bic)
+","Akaike’s Information Criterion (AIC), Cross-Validation",ChatGPT
